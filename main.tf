@@ -27,6 +27,36 @@ resource "aws_subnet" "az1_subnet" {
   }
 }
 
+/*==== Transit Gateway ====*/
+
+resource "aws_ec2_transit_gateway" "transit_gateway" {
+  description = "Shared Services Transit Gateway"
+}
+
+/*==== Transit Gateway - VPC Attachment ====*/
+data "aws_subnets" "subnet_ids" {
+  filter {
+    name   = "vpc-id"
+    values = [aws_vpc.vpc.id]
+  }
+}
+
+resource "aws_ec2_transit_gateway_vpc_attachment" "tgw_attach" {  
+  subnet_ids         = tolist(data.aws_subnets.subnet_ids.ids)
+  transit_gateway_id = aws_ec2_transit_gateway.transit_gateway.id
+  vpc_id             = aws_vpc.vpc.id
+  ipv6_support       = "disable"
+  dns_support        = "enable"
+  transit_gateway_default_route_table_association = false
+  transit_gateway_default_route_table_propagation = false
+  tags = {
+    Name         = var.vpc_name
+    Owner        = var.owner
+    Project_name = var.project_name
+    Environment  = var.environment
+  }
+}
+
 resource "aws_vpc_ipam" "main" {
   description = "My IPAM"
   operating_regions {
