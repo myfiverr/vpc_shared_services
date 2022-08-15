@@ -25,3 +25,11 @@ variable "environment" {
 variable "subnet_details" {
   description = "The Subnet details"
 }
+
+variable aws_access_key {
+  description = "AWS Access Key"
+}
+
+variable "aws_secret_key" {
+  description = "AWS Secret Key"
+}
